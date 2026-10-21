@@ -1,0 +1,11 @@
+{{ block title }}Real-Time Auction: Instructions{{ endblock }}
+{{ block content }}
+<p>You are in a group of {{ C.PLAYERS_PER_GROUP }} bidders. One item worth <b>{{ C.ITEM_VALUE }} €</b> to each of you is for sale.</p>
+<ul>
+    <li>Each of you has a budget of <b>{{ C.BUDGET }} €</b>.</li>
+    <li>The starting bid is <b>{{ C.STARTING_BID }} €</b>. Every new bid must beat the current highest bid and cannot exceed your budget.</li>
+    <li>The auction lasts <b>{{ C.TIMEOUT_SECONDS }} seconds</b>. You can chat with your group while it runs.</li>
+    <li>If you win: you earn budget − your bid + {{ C.ITEM_VALUE }} €. If you do not win: you keep your {{ C.BUDGET }} € budget.</li>
+</ul>
+{{ next_button }}
+{{ endblock }}

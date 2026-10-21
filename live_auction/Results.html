@@ -1,0 +1,32 @@
+{{ block title }}Auction Results{{ endblock }}
+
+{{ block content }}
+{{ if has_winner }}
+    <div class="alert alert-info">
+        <p class="mb-1">Winner: <b>{{ winner_label }}</b>{{ if i_won }} (that's you!){{ endif }}</p>
+        <p class="mb-0">Final transaction price: <b>{{ final_price }} €</b></p>
+    </div>
+{{ else }}
+    <div class="alert alert-secondary">
+        Nobody placed a valid bid. There is no winner and no transaction.
+    </div>
+{{ endif }}
+
+<h5>Payoffs</h5>
+<table class="table table-sm w-auto">
+    <thead>
+        <tr><th>Player</th><th>Payoff</th><th></th></tr>
+    </thead>
+    <tbody>
+    {{ for r in rows }}
+        <tr {{ if r.is_me }}class="table-active"{{ endif }}>
+            <td>{{ r.label }}{{ if r.is_me }} (you){{ endif }}</td>
+            <td>{{ r.payoff }}</td>
+            <td>{{ if r.is_winner }}winner{{ endif }}</td>
+        </tr>
+    {{ endfor }}
+    </tbody>
+</table>
+
+{{ next_button }}
+{{ endblock }}

@@ -1,0 +1,82 @@
+{{ block title }}Live Auction{{ endblock }}
+
+{{ block content }}
+<div class="row">
+
+    <!-- LEFT: bidding -->
+    <div class="col-md-7">
+        <div class="card mb-3">
+            <div class="card-body text-center">
+                <p class="mb-1 text-muted">Current highest bid</p>
+                <h2><span id="highest-bid">{{ C.STARTING_BID }}</span> €</h2>
+                <p class="mb-0">Current leader: <b id="leader">nobody yet</b></p>
+            </div>
+        </div>
+
+        <p>Your budget: <b>{{ C.BUDGET }} €</b></p>
+
+        <div class="input-group mb-2">
+            <input type="number" id="bid-input" class="form-control"
+                   min="1" step="1" placeholder="Your bid (€)" autocomplete="off">
+            <button type="button" id="bid-btn" class="btn btn-primary">Place Bid</button>
+        </div>
+
+        <div id="error-msg" class="text-danger" style="min-height: 1.5em;"></div>
+    </div>
+
+    <!-- RIGHT: chat -->
+    <div class="col-md-5">
+        <h5>Trading Floor Chat</h5>
+        {{ chat }}
+    </div>
+
+</div>
+{{ endblock }}
+
+{{ block scripts }}
+<script>
+    const errorBox = document.getElementById('error-msg');
+    const bidInput = document.getElementById('bid-input');
+
+    function placeBid() {
+        errorBox.textContent = '';
+        liveSend({type: 'bid', bid: bidInput.value});
+        bidInput.value = '';
+        bidInput.focus();
+    }
+
+    document.getElementById('bid-btn').addEventListener('click', placeBid);
+
+    bidInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();      // never submit the oTree form
+            placeBid();
+        }
+    });
+
+    function liveRecv(data) {
+        // Private error message (only sent to the sender)
+        if (data.error) {
+            errorBox.textContent = data.error;
+            return;
+        }
+        // Public state update (broadcast or initial sync)
+        errorBox.textContent = '';
+        document.getElementById('highest-bid').textContent = data.highest_bid;
+
+        const leaderEl = document.getElementById('leader');
+        if (!data.leader) {
+            leaderEl.textContent = 'nobody yet';
+        } else if (data.highest_bidder === js_vars.my_id) {
+            leaderEl.textContent = data.leader + ' (you)';
+        } else {
+            leaderEl.textContent = data.leader;
+        }
+    }
+
+    // On load, ask the server for the current state (handles page reloads / late loads)
+    document.addEventListener('DOMContentLoaded', function () {
+        liveSend({type: 'sync'});
+    });
+</script>
+{{ endblock }}
